@@ -1,3 +1,6 @@
+extern crate colored;
+
+use colored::Colorize;
 use std::io::Error;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::thread;
@@ -12,12 +15,16 @@ fn tcp_ping(addr: &SocketAddr, timeout: Duration) -> Result<Duration, Error> {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let host = "xiaozhou.net";
+    let host = "github.com";
     let port = 443;
     let timeout = Duration::from_secs(5);
     let num_pings = 7;
 
-    println!("TCPinging {} on port {}.", host, port);
+    println!(
+        "TCPinging {} on port {}.",
+        host.yellow(),
+        port.to_string().yellow(),
+    );
 
     let addr = (host, port)
         .to_socket_addrs()?
@@ -41,7 +48,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         // Add a small delay between pings
-        thread::sleep(Duration::from_millis(300));
+        thread::sleep(Duration::from_millis(500));
     }
 
     Ok(())
