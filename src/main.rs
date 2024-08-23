@@ -1,5 +1,6 @@
 extern crate colored;
 
+use clap::{command, Arg};
 use colored::Colorize;
 use std::io::Error;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
@@ -15,8 +16,24 @@ fn tcp_ping(addr: &SocketAddr, timeout: Duration) -> Result<Duration, Error> {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let host = "github.com";
-    let port = 443;
+    let matches = command!()
+        .arg(
+            Arg::new("host")
+                .required(true)
+                .index(1)
+                .help("Host to ping"),
+        )
+        .arg(
+            Arg::new("port")
+                .required(true)
+                .index(2)
+                .help("Port to ping"),
+        )
+        .get_matches();
+
+    let host = matches.get_one::<String>("host").unwrap().clone();
+    let port = matches.get_one::<String>("port").unwrap().to_owned();
+    let port_num = port.parse::<u16>()?;
     let timeout = Duration::from_secs(5);
     let num_pings = 7;
 
@@ -26,7 +43,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         port.to_string().yellow(),
     );
 
-    let addr = (host, port)
+    let addr = (host.clone(), port_num)
         .to_socket_addrs()?
         .next()
         .ok_or("Failed to resolve address")?;
