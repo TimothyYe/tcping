@@ -7,6 +7,9 @@ use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::thread;
 use std::time::{Duration, Instant};
 
+const INTERVAL: Duration = Duration::from_millis(500);
+const DEFAULT_TIMEOUT: Duration = Duration::from_secs(5);
+
 fn tcp_ping(addr: &SocketAddr, timeout: Duration) -> Result<Duration, Error> {
     let start = Instant::now();
     match TcpStream::connect_timeout(addr, timeout) {
@@ -43,7 +46,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let port_num = port.parse::<u16>()?;
     let num = matches.get_one::<String>("n").unwrap().to_owned();
     let num_pings = num.parse::<u32>().unwrap().to_owned();
-    let timeout = Duration::from_secs(5);
 
     println!(
         "TCPinging {} on port {}.",
@@ -58,7 +60,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ip = addr.ip();
 
     for i in 1..=num_pings {
-        match tcp_ping(&addr, timeout) {
+        match tcp_ping(&addr, DEFAULT_TIMEOUT) {
             Ok(duration) => {
                 println!(
                     "Reply from {}({}) on port {} TCP_conn={} time={:.3} ms",
@@ -73,7 +75,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         // Add a small delay between pings
-        thread::sleep(Duration::from_millis(500));
+        thread::sleep(INTERVAL);
     }
 
     Ok(())
