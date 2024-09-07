@@ -29,18 +29,18 @@ impl StatsCalculator {
     }
 
     pub fn stddev(&self) -> f64 {
-        let count = self.latencies.len() as f64;
-        if count == 0.0 {
+        let n = self.latencies.len() as f64;
+        if n < 2.0 {
             return 0.0;
         }
-        let mean: f64 = self.latencies.iter().sum::<f64>() / count;
-        let variance: f64 = self
-            .latencies
-            .iter()
-            .map(|&x| (x - mean).powi(2))
-            .sum::<f64>()
-            / count;
-        variance.sqrt()
+        let mut mean = 0.0;
+        let mut m2 = 0.0;
+        for (i, &x) in self.latencies.iter().enumerate() {
+            let delta = x - mean;
+            mean += delta / (i as f64 + 1.0);
+            m2 += delta * (x - mean);
+        }
+        (m2 / (n - 1.0)).sqrt()
     }
 
     pub fn get_result(&self) -> PingStats {
