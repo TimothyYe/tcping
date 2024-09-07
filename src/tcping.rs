@@ -87,6 +87,16 @@ fn tcp_ping(addr: &SocketAddr, timeout: Duration) -> Result<Duration, std::io::E
     let start = Instant::now();
     match TcpStream::connect_timeout(addr, timeout) {
         Ok(_) => Ok(start.elapsed()),
-        Err(e) => Err(e),
+        Err(e) => match e.kind() {
+            std::io::ErrorKind::TimedOut => Err(std::io::Error::new(
+                std::io::ErrorKind::TimedOut,
+                "Connection timed out",
+            )),
+            std::io::ErrorKind::ConnectionRefused => Err(std::io::Error::new(
+                std::io::ErrorKind::ConnectionRefused,
+                "Connection refused",
+            )),
+            _ => Err(e),
+        },
     }
 }
