@@ -20,12 +20,12 @@ tcping <host> <port> -n <number_of_pings>
 
 * `<host>` : The host to ping.
 * `<port>` : The port to ping.
-* `-n, --number` : The number of ping attempts (default is 4).
+* `-n, --number` : The number of ping attempts (default is 10).
 
 ### Example
 
 ```sh
-tcping google.com 443 -n 10
+tcping google.com 443 -n 5
 ```
 
 ## Installation
