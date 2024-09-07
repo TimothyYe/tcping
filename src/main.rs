@@ -1,4 +1,5 @@
 use clap::{command, Arg};
+mod stats;
 mod tcping;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
