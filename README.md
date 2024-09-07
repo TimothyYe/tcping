@@ -50,7 +50,7 @@ cargo build --release
 
 ### From Binary
 
-Download the binary from the [Releases]() page.
+Download the binary from the [Releases](https://github.com/TimothyYe/tcping/releases) page.
 
 ## License
 
