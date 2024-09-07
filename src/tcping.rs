@@ -10,7 +10,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 const INTERVAL: Duration = Duration::from_millis(500);
-const DEFAULT_TIMEOUT: Duration = Duration::from_secs(5);
+const DEFAULT_TIMEOUT: Duration = Duration::from_secs(3);
 
 pub fn run_tcping(host: &str, port: u16, num_pings: u32) -> Result<(), Box<dyn std::error::Error>> {
     let mut stats = StatsCalculator::new();
@@ -77,7 +77,7 @@ pub fn run_tcping(host: &str, port: u16, num_pings: u32) -> Result<(), Box<dyn s
         ping_stat.min_latency,
         ping_stat.avg_latency,
         ping_stat.max_latency,
-        ping_stat.stddev_latency
+        ping_stat.std_dev_latency
     );
 
     Ok(())

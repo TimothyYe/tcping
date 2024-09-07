@@ -4,7 +4,7 @@ pub struct PingStats {
     pub avg_latency: f64,
     pub max_latency: f64,
     pub min_latency: f64,
-    pub stddev_latency: f64,
+    pub std_dev_latency: f64,
 }
 
 pub struct StatsCalculator {
@@ -28,7 +28,7 @@ impl StatsCalculator {
         self.loss += 1;
     }
 
-    pub fn stddev(&self) -> f64 {
+    pub fn std_dev(&self) -> f64 {
         let n = self.latencies.len() as f64;
         if n < 2.0 {
             return 0.0;
@@ -44,15 +44,11 @@ impl StatsCalculator {
     }
 
     pub fn get_result(&self) -> PingStats {
-        let sum: f64 = self.latencies.iter().sum();
+        let sum = if self.latencies.is_empty() { 0.0 } else { self.latencies.iter().sum() };
         let count = self.latencies.len() as f64;
-        let avg = sum / count;
-        let max = self
-            .latencies
-            .iter()
-            .cloned()
-            .fold(f64::NEG_INFINITY, f64::max);
-        let min = self.latencies.iter().cloned().fold(f64::INFINITY, f64::min);
+        let avg = if count == 0.0 { 0.0 } else { sum / count };
+        let max = if count == 0.0 { 0.0 } else { self.latencies.iter().cloned().fold(f64::NEG_INFINITY, f64::max)};
+        let min = if count == 0.0 { 0.0 } else { self.latencies.iter().cloned().fold(f64::INFINITY, f64::min)};
 
         PingStats {
             total_packages: count as i32 + self.loss,
@@ -60,7 +56,7 @@ impl StatsCalculator {
             avg_latency: avg,
             max_latency: max,
             min_latency: min,
-            stddev_latency: self.stddev(),
+            std_dev_latency: self.std_dev(),
         }
     }
 }
