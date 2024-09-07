@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.5.16", features = ["cargo"] }
 colored = "2.1.0"
+ctrlc = "3.4.5"

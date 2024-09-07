@@ -1,6 +1,11 @@
 use crate::stats::StatsCalculator;
 use colored::Colorize;
+use ctrlc;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc,
+};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -9,6 +14,12 @@ const DEFAULT_TIMEOUT: Duration = Duration::from_secs(5);
 
 pub fn run_tcping(host: &str, port: u16, num_pings: u32) -> Result<(), Box<dyn std::error::Error>> {
     let mut stats = StatsCalculator::new();
+    let running = Arc::new(AtomicBool::new(true));
+    let r = running.clone();
+
+    ctrlc::set_handler(move || {
+        r.store(false, Ordering::SeqCst);
+    })?;
 
     println!(
         "TCPing {} on port {}.",
@@ -23,6 +34,11 @@ pub fn run_tcping(host: &str, port: u16, num_pings: u32) -> Result<(), Box<dyn s
     let ip = addr.ip();
 
     for i in 1..=num_pings {
+        // Check for SIGINT signal
+        if !running.load(Ordering::SeqCst) {
+            break;
+        }
+
         match tcp_ping(&addr, DEFAULT_TIMEOUT) {
             Ok(duration) => {
                 println!(
@@ -35,25 +51,33 @@ pub fn run_tcping(host: &str, port: u16, num_pings: u32) -> Result<(), Box<dyn s
                 );
                 stats.add(duration.as_secs_f64() * 1000.0);
             }
-            Err(e) => println!("Failed to connect (TCP_conn={}): {}", i, e),
+            Err(e) => {
+                println!("Failed to connect (TCP_conn={}): {}", i, e);
+                stats.add_loss();
+            }
         }
 
         thread::sleep(INTERVAL);
     }
 
-    let (total, avg, max, min) = stats.get_result();
+    let ping_stat = stats.get_result();
     println!("--- {} ping statistics ---", host);
 
     println!(
         "{} packets transmitted, {} packets received, {:.1}% packet loss",
-        num_pings,
-        total,
-        (1.0 - total as f64 / num_pings as f64) * 100.0
+        ping_stat.total_packages,
+        ping_stat.received_packages,
+        ((ping_stat.total_packages - ping_stat.received_packages) as f64
+            / ping_stat.total_packages as f64)
+            * 100.0
     );
 
     println!(
-        "round-trip min/avg/max = {:.3}/{:.3}/{:.3} ms",
-        min, avg, max
+        "round-trip min/avg/max/stddev = {:.3}/{:.3}/{:.3}/{:.3} ms",
+        ping_stat.min_latency,
+        ping_stat.avg_latency,
+        ping_stat.max_latency,
+        ping_stat.stddev_latency
     );
 
     Ok(())
