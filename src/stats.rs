@@ -44,7 +44,7 @@ impl StatsCalculator {
     }
 
     pub fn get_result(&self) -> PingStats {
-        let sum = if self.latencies.is_empty() { 0.0 } else { self.latencies.iter().sum() };
+        let sum :f64 =  self.latencies.iter().sum();
         let count = self.latencies.len() as f64;
         let avg = if count == 0.0 { 0.0 } else { sum / count };
         let max = if count == 0.0 { 0.0 } else { self.latencies.iter().cloned().fold(f64::NEG_INFINITY, f64::max)};

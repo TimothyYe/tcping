@@ -41,15 +41,16 @@ pub fn run_tcping(host: &str, port: u16, num_pings: u32) -> Result<(), Box<dyn s
 
         match tcp_ping(&addr, DEFAULT_TIMEOUT) {
             Ok(duration) => {
+                let latency = duration.as_secs_f64() * 1000.0;
                 println!(
                     "Reply from {}({}) on port {} TCP_conn={} time={:.3} ms",
                     host,
                     ip,
                     port,
                     i,
-                    duration.as_secs_f64() * 1000.0
+                    latency
                 );
-                stats.add(duration.as_secs_f64() * 1000.0);
+                stats.add(latency);
             }
             Err(e) => {
                 println!("Failed to connect (TCP_conn={}): {}", i, e);

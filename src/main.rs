@@ -25,11 +25,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .get_matches();
 
-    let host = matches.get_one::<String>("host").unwrap().clone();
+    let host = matches.get_one::<String>("host").unwrap();
     let port = matches.get_one::<String>("port").unwrap().to_owned();
     let port_num = port.parse::<u16>()?;
     let num = matches.get_one::<String>("n").unwrap().to_owned();
     let num_pings = num.parse::<u32>().unwrap().to_owned();
 
-    tcping::run_tcping(&host, port_num, num_pings)
+    tcping::run_tcping(host, port_num, num_pings)
 }
