@@ -44,11 +44,7 @@ pub fn run_tcping(host: &str, port: u16, num_pings: u32) -> Result<(), Box<dyn s
                 let latency = duration.as_secs_f64() * 1000.0;
                 println!(
                     "Reply from {}({}) on port {} TCP_conn={} time={:.3} ms",
-                    host,
-                    ip,
-                    port,
-                    i,
-                    latency
+                    host, ip, port, i, latency
                 );
                 stats.add(latency);
             }
