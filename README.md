@@ -2,6 +2,8 @@
 
 TCPing is a command-line tool for pinging a TCP port on a specified host, implemented in Rust. It provides statistics such as average, maximum, and minimum latency for the pinged host.
 
+[中文版 README](README_CN.md)
+
 [![asciicast](https://asciinema.org/a/CgpXmFi9g8guvfOyDpm9ehtml.svg)](https://asciinema.org/a/CgpXmFi9g8guvfOyDpm9ehtml)
 
 ## Features
