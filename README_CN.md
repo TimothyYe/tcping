@@ -13,19 +13,22 @@ TCPing 是一个命令行工具，用于 ping 指定主机上的 TCP 端口，�
 ## 使用方法
 
 ```sh
-tcping <host> <port> -n <number_of_pings>
+tcping <host> <port> [-n <number_of_pings>] [-t <timeout>] [-i <interval>]
 ```
 
 ### 参数
 
 * `<host>` : 要 ping 的主机。
 * `<port>` : 要 ping 的端口。
-* `-n, --number` : ping 尝试次数（默认为 10）。
+* `-n, --num` : ping 尝试次数（默认为 10）。
+* `-t, --timeout` : 每次连接尝试的超时时间，以秒为单位（默认为 3）。
+* `-i, --interval` : ping 之间的时间间隔，以毫秒为单位（默认为 500）。
 
 ### 示例
 
 ```sh
 tcping google.com 443 -n 5
+tcping google.com 443 -n 20 -t 5 -i 1000
 ```
 
 ## 安装
@@ -47,7 +50,7 @@ cargo build --release
 3. 运行二进制文件：
 
 ```sh
-./target/release/tcping google.com 443 -n 10
+./target/release/tcping google.com 443 -n 10 -t 3 -i 500
 ```
 
 ### 从二进制文件安装

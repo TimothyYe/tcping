@@ -15,19 +15,22 @@ TCPing is a command-line tool for pinging a TCP port on a specified host, implem
 ## Usage
 
 ```sh
-tcping <host> <port> -n <number_of_pings>
+tcping <host> <port> [-n <number_of_pings>] [-t <timeout>] [-i <interval>]
 ```
 
 ### Parameters
 
 * `<host>` : The host to ping.
 * `<port>` : The port to ping.
-* `-n, --number` : The number of ping attempts (default is 10).
+* `-n, --num` : The number of ping attempts (default is 10).
+* `-t, --timeout` : Timeout in seconds for each connection attempt (default is 3).
+* `-i, --interval` : Time interval between pings in milliseconds (default is 500).
 
 ### Example
 
 ```sh
 tcping google.com 443 -n 5
+tcping google.com 443 -n 20 -t 5 -i 1000
 ```
 
 ## Installation
@@ -49,7 +52,7 @@ cargo build --release
 3. Run the binary:
 
 ```sh
-./target/release/tcping google.com 443 -n 10
+./target/release/tcping google.com 443 -n 10 -t 3 -i 500
 ```
 
 ### From Binary
