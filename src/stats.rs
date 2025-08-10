@@ -33,22 +33,48 @@ impl StatsCalculator {
         if n < 2.0 {
             return 0.0;
         }
-        let mut mean = 0.0;
-        let mut m2 = 0.0;
-        for (i, &x) in self.latencies.iter().enumerate() {
-            let delta = x - mean;
-            mean += delta / (i as f64 + 1.0);
-            m2 += delta * (x - mean);
+
+        // Use more numerically stable Welford's online algorithm
+        let mut mean = self.latencies[0];
+        let mut s = 0.0;
+
+        for i in 1..self.latencies.len() {
+            let x = self.latencies[i];
+            let old_mean = mean;
+            mean += (x - mean) / (i as f64 + 1.0);
+            s += (x - mean) * (x - old_mean);
         }
-        (m2 / (n - 1.0)).sqrt()
+
+        (s / (n - 1.0)).sqrt()
     }
 
     pub fn get_result(&self) -> PingStats {
-        let sum :f64 =  self.latencies.iter().sum();
-        let count = self.latencies.len() as f64;
-        let avg = if count == 0.0 { 0.0 } else { sum / count };
-        let max = if count == 0.0 { 0.0 } else { self.latencies.iter().cloned().fold(f64::NEG_INFINITY, f64::max)};
-        let min = if count == 0.0 { 0.0 } else { self.latencies.iter().cloned().fold(f64::INFINITY, f64::min)};
+        let count = self.latencies.len();
+
+        if count == 0 {
+            return PingStats {
+                total_packages: self.loss,
+                received_packages: 0,
+                avg_latency: 0.0,
+                max_latency: 0.0,
+                min_latency: 0.0,
+                std_dev_latency: 0.0,
+            };
+        }
+
+        let count_f64 = count as f64;
+        // Calculate statistics in a single pass
+        let mut sum = 0.0;
+        let mut min = f64::INFINITY;
+        let mut max = f64::NEG_INFINITY;
+
+        for &latency in &self.latencies {
+            sum += latency;
+            min = min.min(latency);
+            max = max.max(latency);
+        }
+
+        let avg = sum / count_f64;
 
         PingStats {
             total_packages: count as i32 + self.loss,
