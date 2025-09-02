@@ -41,17 +41,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .get_matches();
 
     let host = matches.get_one::<String>("host").unwrap();
-    let port = matches.get_one::<String>("port").unwrap().to_owned();
-    let port_num = port.parse::<u16>()?;
-    let num = matches.get_one::<String>("n").unwrap().to_owned();
-    let num_pings = num.parse::<u32>().unwrap().to_owned();
+    let port_num = matches.get_one::<String>("port").unwrap().parse::<u16>()?;
+    let num_pings = matches.get_one::<String>("n").unwrap().parse::<u32>()?;
 
-    let timeout_str = matches.get_one::<String>("t").unwrap().to_owned();
-    let timeout_secs = timeout_str.parse::<u64>().unwrap_or(3);
+    let timeout_secs = matches.get_one::<String>("t").unwrap().parse::<u64>()?;
     let timeout = Duration::from_secs(timeout_secs);
 
-    let interval_str = matches.get_one::<String>("i").unwrap().to_owned();
-    let interval_ms = interval_str.parse::<u64>().unwrap_or(500);
+    let interval_ms = matches.get_one::<String>("i").unwrap().parse::<u64>()?;
     let interval = Duration::from_millis(interval_ms);
 
     tcping::run_tcping(host, port_num, num_pings, timeout, interval)
