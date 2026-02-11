@@ -3,7 +3,7 @@ use std::process::Command;
 #[test]
 fn test_help_output() {
     let output = Command::new("cargo")
-        .args(&["run", "--", "--help"])
+        .args(["run", "--", "--help"])
         .output()
         .expect("failed to execute process");
 
@@ -18,7 +18,7 @@ fn test_help_output() {
 #[test]
 fn test_missing_required_args() {
     let output = Command::new("cargo")
-        .args(&["run", "--", "google.com"])
+        .args(["run", "--", "google.com"])
         .output()
         .expect("failed to execute process");
 
@@ -30,7 +30,7 @@ fn test_missing_required_args() {
 #[test]
 fn test_invalid_port() {
     let output = Command::new("cargo")
-        .args(&["run", "--", "google.com", "70000"]) // Port > 65535
+        .args(["run", "--", "google.com", "70000"]) // Port > 65535
         .output()
         .expect("failed to execute process");
 
@@ -40,7 +40,7 @@ fn test_invalid_port() {
 #[test]
 fn test_invalid_timeout() {
     let output = Command::new("cargo")
-        .args(&["run", "--", "google.com", "80", "-t", "invalid"])
+        .args(["run", "--", "google.com", "80", "-t", "invalid"])
         .output()
         .expect("failed to execute process");
 
@@ -50,7 +50,7 @@ fn test_invalid_timeout() {
 #[test]
 fn test_invalid_interval() {
     let output = Command::new("cargo")
-        .args(&["run", "--", "google.com", "80", "-i", "not_a_number"])
+        .args(["run", "--", "google.com", "80", "-i", "not_a_number"])
         .output()
         .expect("failed to execute process");
 
@@ -60,7 +60,7 @@ fn test_invalid_interval() {
 #[test]
 fn test_valid_arguments() {
     let output = Command::new("cargo")
-        .args(&[
+        .args([
             "run",
             "--",
             "127.0.0.1",
@@ -93,7 +93,7 @@ fn test_valid_arguments() {
 fn test_default_values() {
     // Test that default values are used when not specified
     let output = Command::new("cargo")
-        .args(&["run", "--", "127.0.0.1", "9999"]) // Use unlikely port to avoid actual connections
+        .args(["run", "--", "127.0.0.1", "9999"]) // Use unlikely port to avoid actual connections
         .output()
         .expect("failed to execute process");
 
@@ -106,7 +106,7 @@ fn test_default_values() {
 #[test]
 fn test_custom_ping_count() {
     let output = Command::new("cargo")
-        .args(&["run", "--", "127.0.0.1", "9999", "-n", "2"])
+        .args(["run", "--", "127.0.0.1", "9999", "-n", "2"])
         .output()
         .expect("failed to execute process");
 
@@ -122,7 +122,7 @@ fn test_custom_ping_count() {
 #[test]
 fn test_long_argument_names() {
     let output = Command::new("cargo")
-        .args(&[
+        .args([
             "run",
             "--",
             "127.0.0.1",
@@ -146,7 +146,7 @@ fn test_long_argument_names() {
 #[test]
 fn test_zero_ping_count() {
     let output = Command::new("cargo")
-        .args(&["run", "--", "google.com", "80", "-n", "0"])
+        .args(["run", "--", "google.com", "80", "-n", "0"])
         .output()
         .expect("failed to execute process");
 
