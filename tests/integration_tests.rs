@@ -60,20 +60,32 @@ fn test_invalid_interval() {
 #[test]
 fn test_valid_arguments() {
     let output = Command::new("cargo")
-        .args(&["run", "--", "127.0.0.1", "9999", "-n", "1", "-t", "1", "-i", "100"])
+        .args(&[
+            "run",
+            "--",
+            "127.0.0.1",
+            "9999",
+            "-n",
+            "1",
+            "-t",
+            "1",
+            "-i",
+            "100",
+        ])
         .output()
         .expect("failed to execute process");
 
     let stdout = String::from_utf8(output.stdout).unwrap();
     let stderr = String::from_utf8(output.stderr).unwrap();
-    
+
     // Check that the program started successfully (not argument parsing errors)
     // The output should contain tcping startup message or show that it ran
     assert!(
-        stdout.contains("TCPing") || 
-        stdout.contains("ping statistics") ||
-        output.status.success(),
-        "Stdout: {}\nStderr: {}\nStatus: {:?}", stdout, stderr, output.status
+        stdout.contains("TCPing") || stdout.contains("ping statistics") || output.status.success(),
+        "Stdout: {}\nStderr: {}\nStatus: {:?}",
+        stdout,
+        stderr,
+        output.status
     );
 }
 
@@ -86,7 +98,7 @@ fn test_default_values() {
         .expect("failed to execute process");
 
     let stdout = String::from_utf8(output.stdout).unwrap();
-    
+
     // Should start with TCPing output showing the defaults are applied
     assert!(stdout.contains("TCPing 127.0.0.1 on port 9999"));
 }
@@ -99,7 +111,7 @@ fn test_custom_ping_count() {
         .expect("failed to execute process");
 
     let stdout = String::from_utf8(output.stdout).unwrap();
-    
+
     // Should show exactly 2 connection attempts (or failures)
     let tcp_conn_count = stdout.matches("TCP_conn=").count();
     // Should be 2 attempts (though they may fail)
@@ -110,12 +122,23 @@ fn test_custom_ping_count() {
 #[test]
 fn test_long_argument_names() {
     let output = Command::new("cargo")
-        .args(&["run", "--", "127.0.0.1", "9999", "--num", "1", "--timeout", "1", "--interval", "100"])
+        .args(&[
+            "run",
+            "--",
+            "127.0.0.1",
+            "9999",
+            "--num",
+            "1",
+            "--timeout",
+            "1",
+            "--interval",
+            "100",
+        ])
         .output()
         .expect("failed to execute process");
 
     let stdout = String::from_utf8(output.stdout).unwrap();
-    
+
     // Should work the same as short arguments
     assert!(stdout.contains("TCPing 127.0.0.1 on port 9999"));
 }
@@ -128,7 +151,7 @@ fn test_zero_ping_count() {
         .expect("failed to execute process");
 
     let stdout = String::from_utf8(output.stdout).unwrap();
-    
+
     // Should still show statistics but with 0 attempts
     if stdout.contains("ping statistics") {
         assert!(stdout.contains("0 packets transmitted"));
