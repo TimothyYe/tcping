@@ -7,3 +7,9 @@ edition = "2021"
 clap = { version = "4.5.16", features = ["cargo"] }
 colored = "2.1.0"
 ctrlc = "3.4.5"
+
+[profile.release]
+lto = true
+strip = true
+panic = "abort"
+codegen-units = 1

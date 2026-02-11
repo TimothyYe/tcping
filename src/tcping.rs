@@ -1,6 +1,5 @@
 use crate::stats::StatsCalculator;
 use colored::Colorize;
-use ctrlc;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -21,7 +20,7 @@ pub fn run_tcping(
     let r = running.clone();
 
     ctrlc::set_handler(move || {
-        r.store(false, Ordering::SeqCst);
+        r.store(false, Ordering::Relaxed);
     })?;
 
     println!(
@@ -37,8 +36,7 @@ pub fn run_tcping(
     let ip = addr.ip();
 
     for i in 1..=num_pings {
-        // Check for SIGINT signal
-        if !running.load(Ordering::SeqCst) {
+        if !running.load(Ordering::Relaxed) {
             break;
         }
 
@@ -46,22 +44,23 @@ pub fn run_tcping(
             Ok(duration) => {
                 let latency = duration.as_secs_f64() * 1000.0;
                 println!(
-                    "Reply from {}({}) on port {} TCP_conn={} time={:.3} ms",
-                    host, ip, port, i, latency
+                    "Reply from {host}({ip}) on port {port} TCP_conn={i} time={latency:.3} ms"
                 );
                 stats.add(latency);
             }
             Err(e) => {
-                println!("Failed to connect (TCP_conn={}): {}", i, e);
+                println!("Failed to connect (TCP_conn={i}): {e}");
                 stats.add_loss();
             }
         }
 
-        thread::sleep(interval);
+        if i < num_pings {
+            thread::sleep(interval);
+        }
     }
 
     let ping_stat = stats.get_result();
-    println!("--- {} ping statistics ---", host);
+    println!("--- {host} ping statistics ---");
 
     println!(
         "{} packets transmitted, {} packets received, {:.1}% packet loss",
@@ -114,7 +113,7 @@ fn tcp_ping(addr: &SocketAddr, timeout: Duration) -> Result<Duration, std::io::E
             )),
             _ => Err(std::io::Error::new(
                 e.kind(),
-                format!("Connection failed: {}", e),
+                format!("Connection failed: {e}"),
             )),
         },
     }
